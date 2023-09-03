@@ -18,6 +18,18 @@ const emailValidator = {
     }
 }
 
+const passwordValidator = {
+    required: "패스워드를 입력해주세요.", 
+    minLength: {
+        value: 8,
+        message: "패스워드가 너무 짧습니다.",
+    },
+    maxLength:{
+        value:20,
+        message: "패스워드가 너무 깁니다.",
+    }
+}
+
 interface IForm {
     email: string;
     firstName: string;
@@ -25,28 +37,42 @@ interface IForm {
     username: string;
     password: string;
     password1: string;
+    extraError?: string;
   }
 
 function ToDoList() {
-    const { register, watch, handleSubmit, formState:{errors} } = useForm<IForm>({
+    const { register, watch, handleSubmit, formState:{errors}, setError } = useForm<IForm>({
         defaultValues: {
             email: "@naver.com"
         }
     });
     console.log(watch());
     const onValid = (data:IForm) => {
-        console.log("sumbit :", data);
+        if(data.password !== data.password1) {
+            setError("password1", {message:"Password are not the same."}, { shouldFocus : true})
+        }
+        // setError("extraError", {message: "Server offline"});
     };
 
     return <div>
              <Form onSubmit={handleSubmit(onValid)}>
-                 <input {...register("email", emailValidator)} placeholder="Email" /><span>{errors?.email?.message}</span>
-                 <input {...register("firstName", {required: "write here"})} placeholder="First Name" />
+                 <input {...register("email", emailValidator)} placeholder="Email" />
+                 <span>{errors?.email?.message}</span>
+                 <input {...register("firstName", {required: "write here", validate: {
+                        noNico : (value) => value.includes("nico")? "no nicos allowed" : true
+                    }
+                })} placeholder="First Name" />
+                 <span>{errors?.firstName?.message}</span>
                  <input {...register("lastName", {required: "write here"})} placeholder="Last Name" />
-                 <input {...register("username", {required: "write here", minLength:10})} placeholder="Username" />
-                 <input {...register("password", {required: "write here", minLength:8, maxLength:20})} placeholder="Password" />
-                 <input {...register("password1", {required: "Password is required", minLength:8, maxLength:20})} placeholder="Password1" />
+                 <span>{errors?.lastName?.message}</span>
+                 <input {...register("username", {required: "write here", minLength:5})} placeholder="Username" />
+                 <span>{errors?.username?.message}</span>
+                 <input {...register("password", passwordValidator)} placeholder="Password" />
+                 <span>{errors?.password?.message}</span>
+                 <input {...register("password1", {required: "패스워드를 입력해주세요.", minLength:8, maxLength:20})} placeholder="Password1" />
+                 <span>{errors?.password1?.message}</span>
                  <button>Add</button>
+                 <span>{errors?.extraError?.message}</span>
              </Form>
         </div>;
 }
