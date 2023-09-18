@@ -2,8 +2,6 @@ import React from "react";
 import { useRecoilState } from "recoil";
 import { hourSelector, minuteState } from "./atoms";
 
-
-
 function App() {
   const [minutes, setMinutes] = useRecoilState(minuteState)
   const [hours, setHours] = useRecoilState(hourSelector);
